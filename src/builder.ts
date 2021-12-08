@@ -4,6 +4,7 @@ import { Logger } from 'tslog'
 export type ModuleDescriptor = {
   controllers: Class<any>[]
 }
+
 export type AppDescriptor = {
   modules: ModuleDescriptor[]
 }
@@ -13,15 +14,15 @@ export interface Class<T> extends Function {
 }
 
 const RESERVED_METHODS_NAMES = ['constructor', 'isController']
-export class Bootstrapper {
+export class RoutesBootstrapper {
   private app: AppDescriptor
   private router: Router
   private logger: Logger
 
-  constructor(appDescriptor: AppDescriptor, router: Router) {
+  constructor(appDescriptor: AppDescriptor, router: Router, logger: Logger) {
     this.app = appDescriptor
     this.router = router
-    this.logger = new Logger({ name: 'node-challenge' })
+    this.logger = logger
   }
 
   buildApplication(): Router {
@@ -41,8 +42,14 @@ export class Bootstrapper {
       throw new Error('Tried to instantiate methods from a non-controller')
 
     const methodNames = this.getControllerMethodsNames(controllerInstance)
-    methodNames.forEach(methodName => this.registerRoutes(controllerInstance[methodName]))
+    methodNames.forEach(methodName =>
+      this.registerRoutes(
+        controllerInstance[methodName],
+        controllerInstance.constructor.name
+      )
+    )
   }
+
   private getControllerMethodsNames(controller: Class<any>): string[] {
     const methodsNames = Object.getOwnPropertyNames(Object.getPrototypeOf(controller))
     return this.removeReservedMethodsNames(methodsNames)
@@ -51,8 +58,9 @@ export class Bootstrapper {
   private removeReservedMethodsNames(methodsNames: string[]): string[] {
     return methodsNames.filter(name => !RESERVED_METHODS_NAMES.includes(name))
   }
-  private registerRoutes(classMethod: Function): void {
+
+  private registerRoutes(classMethod: Function, controllerName: string): void {
     this.router[classMethod['routeType']](classMethod['routePath'], classMethod)
-    this.logger.info('REGISTERED ROUTE: ' + classMethod.name)
+    this.logger.info(`Route ${controllerName}.${classMethod.name} registered.`)
   }
 }

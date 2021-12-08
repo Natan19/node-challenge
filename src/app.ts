@@ -1,21 +1,26 @@
+require('dotenv').config()
 import 'reflect-metadata'
-import { application, Express } from 'express'
 import express from 'express'
 import helmet from 'helmet'
-import { authModuleDescriptor } from './modules/auth/auth.module'
-import { AppDescriptor, Bootstrapper } from './builder'
+import {} from './modules/authentication/auth.module'
+import { RoutesBootstrapper } from './builder'
 import { Router } from 'express'
 import bodyParser from 'body-parser'
+import { appDescriptor } from './app.module'
+import { dbConnect } from './db'
+import { Logger, loggerToken } from './shared/utils/logger/logger'
+import { container } from 'tsyringe'
+
+dbConnect()
 
 const app = express()
 app.use(helmet())
 app.use(bodyParser.json())
 
-const appDescriptor: AppDescriptor = {
-  modules: [authModuleDescriptor]
-}
+// Register all the routes.
+const logger = container.resolve<Logger>(loggerToken)
+const routesBootstrapper = new RoutesBootstrapper(appDescriptor, Router(), logger)
+const router = routesBootstrapper.buildApplication()
 
-const bootstrapper = new Bootstrapper(appDescriptor, Router())
-const router = bootstrapper.buildApplication()
 app.use(router)
 app.listen(3000)
