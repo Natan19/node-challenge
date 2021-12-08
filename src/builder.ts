@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { Logger } from 'tslog'
+import { RouteConfig, routeConfigKey } from './shared/utils/decorators/route.decorator'
 
 export type ModuleDescriptor = {
   controllers: Class<any>[]
@@ -7,6 +8,7 @@ export type ModuleDescriptor = {
 
 export type AppDescriptor = {
   modules: ModuleDescriptor[]
+  controllers: Class<any>[]
 }
 
 export interface Class<T> extends Function {
@@ -60,7 +62,9 @@ export class RoutesBootstrapper {
   }
 
   private registerRoutes(classMethod: Function, controllerName: string): void {
-    this.router[classMethod['routeType']](classMethod['routePath'], classMethod)
+    const routeConfig: RouteConfig =
+      Reflect.getOwnMetadata(routeConfigKey, classMethod) || {}
+    this.router[routeConfig.verb.toLowerCase()](routeConfig.path, classMethod)
     this.logger.info(`Route ${controllerName}.${classMethod.name} registered.`)
   }
 }
