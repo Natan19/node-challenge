@@ -1,5 +1,7 @@
 import { Router } from 'express'
 import { Logger } from 'tslog'
+import { container } from 'tsyringe'
+import { controllerConfigKey } from './shared/utils/decorators/controller.decorator'
 import { RouteConfig, routeConfigKey } from './shared/utils/decorators/route.decorator'
 
 export type ModuleDescriptor = {
@@ -8,7 +10,6 @@ export type ModuleDescriptor = {
 
 export type AppDescriptor = {
   modules: ModuleDescriptor[]
-  controllers: Class<any>[]
 }
 
 export interface Class<T> extends Function {
@@ -39,17 +40,12 @@ export class RoutesBootstrapper {
   }
 
   private instantiateClassesAndRegisterRouters(controller: Class<any>) {
-    const controllerInstance = new controller()
-    if (!controllerInstance.isController)
+    const controllerInstance = container.resolve<typeof controller>(controller)
+    if (!Reflect.hasMetadata(controllerConfigKey, controller))
       throw new Error('Tried to instantiate methods from a non-controller')
 
     const methodNames = this.getControllerMethodsNames(controllerInstance)
-    methodNames.forEach(methodName =>
-      this.registerRoutes(
-        controllerInstance[methodName],
-        controllerInstance.constructor.name
-      )
-    )
+    methodNames.forEach(methodName => this.registerRoutes(controllerInstance, methodName))
   }
 
   private getControllerMethodsNames(controller: Class<any>): string[] {
@@ -61,10 +57,13 @@ export class RoutesBootstrapper {
     return methodsNames.filter(name => !RESERVED_METHODS_NAMES.includes(name))
   }
 
-  private registerRoutes(classMethod: Function, controllerName: string): void {
+  private registerRoutes(controller: Class<any>, methodName: string): void {
     const routeConfig: RouteConfig =
-      Reflect.getOwnMetadata(routeConfigKey, classMethod) || {}
-    this.router[routeConfig.verb.toLowerCase()](routeConfig.path, classMethod)
-    this.logger.info(`Route ${controllerName}.${classMethod.name} registered.`)
+      Reflect.getOwnMetadata(routeConfigKey, controller[methodName]) || {}
+    this.router[routeConfig.verb.toLowerCase()](
+      routeConfig.path,
+      controller[methodName].bind(controller)
+    )
+    this.logger.info(`Route ${controller.name}.${methodName} registered.`)
   }
 }

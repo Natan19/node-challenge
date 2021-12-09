@@ -4,8 +4,8 @@ import { Route } from './shared/utils/decorators/route.decorator'
 
 @Controller
 export class AppController {
-  //   @Route('Get', '/')
-  //   async getTeste(_req: Request, res: Response) {
-  //     res.send('API is running, have fun!')
-  //   }
+  @Route('Get', '/')
+  async getTest(_req: Request, res: Response) {
+    res.send('API is running, have fun!')
+  }
 }

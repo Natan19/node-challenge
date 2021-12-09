@@ -1,9 +1,13 @@
-const { env } = require('./src/env.validator')
+require('dotenv').config()
 
 module.exports = {
   development: {
     client: 'pg',
     useNullAsDefault: true,
-    connection: env.DB_CONNECTION_STRING
+    connection: process.env.DB_CONNECTION_STRING,
+    migrations: {
+      tableName: 'migrations',
+      directory: './src/migrations'
+    }
   }
 }

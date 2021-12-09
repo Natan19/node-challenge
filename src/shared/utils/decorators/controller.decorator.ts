@@ -1,3 +1,5 @@
+export const controllerConfigKey = Symbol('controller-config')
+
 export function Controller(constructor: Function) {
-  constructor.prototype['isController'] = true
+  Reflect.defineMetadata(controllerConfigKey, true, constructor)
 }

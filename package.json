@@ -7,6 +7,7 @@
   "dependencies": {
     "@types/debug": "^4.1.7",
     "@types/express": "^4.17.13",
+    "@types/lodash": "^4.14.178",
     "@types/pg": "^8.6.1",
     "body-parser": "^1.19.0",
     "class-transformer": "^0.5.1",
@@ -17,7 +18,9 @@
     "helmet": "^4.6.0",
     "http-responses-ts": "^0.0.2",
     "knex": "^0.95.14",
+    "lodash": "^4.17.21",
     "objection": "^3.0.0",
+    "objection-password": "^3.0.0",
     "pg": "^8.7.1",
     "reflect-metadata": "^0.1.13",
     "tslog": "^3.3.0",
@@ -26,7 +29,8 @@
   },
   "scripts": {
     "start": "yarn tsc && nodemon dist/app.js",
-    "start:dev": "yarn nodemon"
+    "start:dev": "yarn nodemon",
+    "migrate:up": "yarn --migrations-directory=src/migrations knex migrate:up"
   },
   "devDependencies": {
     "nodemon": "^2.0.15",

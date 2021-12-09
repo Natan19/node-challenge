@@ -1,4 +1,6 @@
+const Password = require('objection-password')()
 import { Model } from 'objection'
+import { autoInjectable, container, injectable } from 'tsyringe'
 
 export enum UserRoles {
   User = 'USER',
@@ -6,12 +8,30 @@ export enum UserRoles {
   Admin = 'ADMIN'
 }
 
-export default class User extends Model {
+@injectable()
+export default class UserModel extends Password(Model) {
   id!: number
-  name!: string
+  firstName!: string
   surname!: string
   picture?: string
-  type?: UserRoles[]
+  roles!: UserRoles[]
+  password!: string
+  email!: string
 
-  static tableName = 'users'
+  static tableName = 'User'
+
+  static get jsonSchema() {
+    return {
+      type: 'object',
+      required: ['firstName', 'surname', 'password', 'roles', 'email'],
+      properties: {
+        id: { type: 'number' },
+        firstName: { type: 'string', minLength: 1, maxLength: 60 },
+        surname: { type: 'string', minLength: 1, maxLength: 60 },
+        password: { type: 'string', minLength: 1 },
+        email: { type: 'string', minLength: 1, maxLength: 255 },
+        roles: { enum: Object.values(UserRoles) }
+      }
+    }
+  }
 }
