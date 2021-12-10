@@ -7,7 +7,6 @@ import {
   MaxLength,
   MinLength
 } from 'class-validator'
-import UserModel from '../models/user.model'
 
 export class CreateUserDto {
   @IsString()

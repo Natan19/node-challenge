@@ -1,0 +1,9 @@
+{
+  "author": {
+    "name": "Author Name",
+    "picture": "https://picture.url"
+  },
+  "category": "Category",
+  "title": "Article title",
+  "summary": "This is a summary of the article"
+}

@@ -64,6 +64,6 @@ export class RoutesBootstrapper {
       routeConfig.path,
       controller[methodName].bind(controller)
     )
-    this.logger.info(`Route ${controller.name}.${methodName} registered.`)
+    this.logger.info(`Route ${controller.constructor.name}.${methodName} registered.`)
   }
 }

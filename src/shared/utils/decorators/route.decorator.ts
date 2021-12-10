@@ -1,7 +1,5 @@
-import { plainToClass, TargetMap } from 'class-transformer'
+import { plainToClass } from 'class-transformer'
 import { validate, ValidationError } from 'class-validator'
-import { getTrailingCommentRanges } from 'typescript'
-import { AuthController } from '../../../modules/authentication/controllers/auth.controller'
 import { DataValidator, dataValidatorKey } from './validate-body.decorator'
 
 export enum ROUTE_TYPES {

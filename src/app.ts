@@ -10,6 +10,7 @@ import { appDescriptor } from './app.module'
 import { dbConnect } from './db'
 import { Logger, loggerToken } from './shared/utils/logger/logger'
 import { container } from 'tsyringe'
+import { loggerMiddleware } from './shared/utils/logger/logger.middleware'
 
 dbConnect()
 
@@ -22,5 +23,5 @@ const logger = container.resolve<Logger>(loggerToken)
 const routesBootstrapper = new RoutesBootstrapper(appDescriptor, Router(), logger)
 const router = routesBootstrapper.buildApplication()
 
-app.use(router)
+app.use('/api', loggerMiddleware, router)
 app.listen(3000)

@@ -1,6 +1,5 @@
 const Password = require('objection-password')()
 import { Model } from 'objection'
-import { autoInjectable, container, injectable } from 'tsyringe'
 
 export enum UserRoles {
   User = 'USER',
@@ -8,7 +7,6 @@ export enum UserRoles {
   Admin = 'ADMIN'
 }
 
-@injectable()
 export default class UserModel extends Password(Model) {
   id!: number
   firstName!: string
